@@ -1,40 +1,49 @@
 import streamlit as st
 import requests
-import random
 
-# Configurar la clave de la API
-api_key = "live_EpKs1MVg387J3r0Jy3VkHJpAjjTxOCuKAb1gqFW8yjjWGTYB4KfxCgVUlHXDUSWr"  
+# URL de la API de The Dog API
+API_URL = "https://api.thedogapi.com/v1/images/search"
+API_KEY = "tu_clave_api_aqui"  # Asegúrate de reemplazar esto por tu API Key real
 
-# URL base de la API
-url = "https://api.thedogapi.com/v1/images/search"
+# Título de la aplicación
+st.title("🌸 ¡Bienvenida a los perritos de Hebe! 🌸")
 
-# Función para obtener un perrito aleatorio
+# Función para obtener los datos del perro
 def obtener_perrito():
-    headers = {
-        'x-api-key': api_key
-    }
-    response = requests.get(url, headers=headers)
-    
-    # Si la respuesta es exitosa, obtenemos la información
-    if response.status_code == 200:
-        datos = response.json()
-        imagen_url = datos[0]['url']
-        descripcion = "Este es un perrito aleatorio."
-        
-        # Agregar datos adicionales si lo deseas
-        return imagen_url, descripcion
-    else:
-        return None, "No se pudo obtener un perrito."
+    headers = {"x-api-key": API_KEY}
+    response = requests.get(API_URL, headers=headers)
+    data = response.json()
 
-# Título de la página
-st.title("PERROS HEBE")
+    # Extraemos la URL de la imagen y otros detalles del perro
+    image_url = data[0]['url']
+    breed = data[0]['breeds'][0] if 'breeds' in data[0] else {}
+    breed_name = breed.get('name', 'Desconocida')
+    temperament = breed.get('temperament', 'Desconocido')
+    height = breed.get('height', {}).get('imperial', 'Desconocido')
+    weight = breed.get('weight', {}).get('imperial', 'Desconocido')
+    life_span = breed.get('life_span', 'Desconocida')
+    origin = breed.get('origin', 'Desconocido')
+    colors = breed.get('color', 'Desconocido')
+    description = breed.get('description', 'No disponible')
+
+    # Mostramos la imagen y los detalles del perro
+    st.image(image_url, use_container_width=True)
+    st.subheader(f"🐶 Nombre de la raza: {breed_name}")
+    st.write(f"🌟 Temperamento: {temperament}")
+    st.write(f"📏 Altura: {height} pulgadas")
+    st.write(f"⚖️ Peso: {weight} libras")
+    st.write(f"💖 Esperanza de vida: {life_span} años")
+    st.write(f"🌍 Origen: {origin}")
+    st.write(f"🎨 Colores: {colors}")
+    st.write(f"📖 Descripción: {description}")
+    st.write("¡Qué lindo es este perrito! 😊")
 
 # Botón para mostrar un perrito aleatorio
-if st.button("Perrito"):
-    imagen_url, descripcion = obtener_perrito()
-    if imagen_url:
-        # Mostrar la imagen y la descripción
-        st.image(imagen_url, caption="Un perrito bonito", use_column_width=True)
-        st.write(descripcion)
-    else:
-        st.write("Hubo un error al obtener la imagen del perrito.")
+if st.button("¡Mostrar un perrito adorable!"):
+    obtener_perrito()
+
+# Mensaje de bienvenida más cálido
+st.write("""
+¡Hola querida! 🌸 Esta es una aplicación especial para ti, donde podrás ver perritos adorables y aprender un poco sobre ellos. 
+Haz clic en el botón para conocer un perrito nuevo y descubrir todos sus detalles. ¡Disfrútalo mucho! 💖
+""")
